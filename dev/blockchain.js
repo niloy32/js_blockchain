@@ -1,50 +1,77 @@
-function Blockchain(params) {
-  this.chain = [];
-  this.PendingTransections = [];
+const sha256 = require("sha256");
+
+function Blockchain() {
+    this.chain = [];
+    this.PendingTransections = [];
+    // Genesis BLock 
+    //CHange later to add data
+    this.createNewBlock(100, "0", "0", "This is Genesis Block");
+
 }
 
 Blockchain.prototype.createNewBlock = function (
-  nonce,
-  previousBlockHas,
-  hash,
-  data
+    nonce,
+    previousBlockHash,
+    hash,
+    data
 ) {
-  const newBlock = {
-    index: this.chain.length + 1,
-    timeStamp: Date.now(),
-    transection: this.PendingTransections,
-    nonce: nonce,
-    hash: hash,
-    previousBlockHas: previousBlockHas,
-    data: data,
-  };
-  this.PendingTransections = [];
-  this.chain.push(newBlock);
+    const newBlock = {
+        index: this.chain.length + 1,
+        timeStamp: Date.now(),
+        transection: this.PendingTransections,
+        nonce: nonce,
+        hash: hash,
+        previousBlockHash: previousBlockHash,
+        data: data,
+    };
+    this.PendingTransections = [];
+    this.chain.push(newBlock);
 
-  return newBlock;
+    return newBlock;
 };
 
 Blockchain.prototype.getLastBlock = function () {
-  return this.chain[this.chain.length - 1];
+    return this.chain[this.chain.length - 1];
 };
 
 //creates new transection onject and pushes it to pending transection.
 //and renturns the number of block it will be added to.
 //you should change this later to add data suited to your need instead of $$
 Blockchain.prototype.createNewTransection = function (
-  ammount,
-  sender,
-  recipient
+    ammount,
+    sender,
+    recipient
 ) {
-  const newTransection = {
-    ammount: ammount,
-    sender: sender,
-    recipient: recipient,
-  };
+    const newTransection = {
+        ammount: ammount,
+        sender: sender,
+        recipient: recipient,
+    };
 
-  this.PendingTransections.push(newTransection);
+    this.PendingTransections.push(newTransection);
 
-  return this.getLastBlock()["index"] + 1;
+    return this.getLastBlock()["index"] + 1;
 };
+
+//this converts the data to fixed size string using sha256
+
+Blockchain.prototype.hashBlock = function (previousBlockhash, currentBlockData, nonce) {
+    const data_as_string =
+        previousBlockhash + nonce.toString() + JSON.stringify(currentBlockData);
+    const hash = sha256(data_as_string);
+    return hash;
+};
+
+Blockchain.prototype.ProofOfWork = function (previousBlockhash, currentBlockData) {
+    let nonce = 0;
+    let hash = this.hashBlock(previousBlockhash, currentBlockData, nonce);
+    while (hash.substring(0, 4) !== '0000') {
+        nonce++;
+        hash = this.hashBlock(previousBlockhash, currentBlockData, nonce);
+        console.log(hash);
+    }
+    return nonce;
+}
+
 
 module.exports = Blockchain;
