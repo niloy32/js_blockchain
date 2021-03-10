@@ -40,12 +40,14 @@ Blockchain.prototype.getLastBlock = function () {
 Blockchain.prototype.createNewTransection = function (
     ammount,
     sender,
-    recipient
+    recipient,
+    data
 ) {
     const newTransection = {
         ammount: ammount,
         sender: sender,
         recipient: recipient,
+        data: data
     };
 
     this.PendingTransections.push(newTransection);
@@ -68,7 +70,7 @@ Blockchain.prototype.ProofOfWork = function (previousBlockhash, currentBlockData
     while (hash.substring(0, 4) !== '0000') {
         nonce++;
         hash = this.hashBlock(previousBlockhash, currentBlockData, nonce);
-        console.log(hash);
+        //console.log(hash);
     }
     return nonce;
 }
