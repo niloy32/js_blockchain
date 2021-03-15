@@ -22,11 +22,42 @@ app.get('/blockchain', function (req, res) {
 
 // sends the data to a node
 app.post('/transaction', function (req, res) {
-    const blockIndex = bitcoin.createNewTransection(req.body.amount, req.body.sender, req.body.recipient, req.body.data)
+    // const blockIndex = bitcoin.createNewTransection(req.body.amount, req.body.sender, req.body.recipient, req.body.data)
+    // res.json({
+    //     note: `Transaction will be addded in block ${blockIndex}.`
+    // });
+    const newTransaction = req.body;
+    const blockIndex = bitcoin.addTransectionToPendingTransaction(newTransaction);
     res.json({
-        note: `Transextion will be addded in block ${blockIndex}.`
+        note: `Transaction will be added in block ${blockIndex}.`
     });
 })
+
+app.post('/transaction/broadcast', function (req, res) {
+    const newTransaction = bitcoin.createNewTransection(req.body.amount, req.body.sender, req.body.recipient, req.body.data)
+    bitcoin.addTransectionToPendingTransaction(newTransaction);
+
+    //makes a promise that will push the new transaction info to other nodes
+    const requestPrmomies = [];
+    // gets all the node info from bitcoin.networkNodes and sends them the transaction info 
+    // one by one to other nodes
+    bitcoin.networkNodes.forEach(networkNodeUrl => {
+        const requestOption = {
+            uri: networkNodeUrl + '/transaction',
+            method: "POST",
+            body: newTransaction,
+            json: true
+        };
+        requestPrmomies.push(rp(requestOption));
+    });
+    Promise.all(requestPrmomies)
+        .then(data => {
+            res.json({
+                note: "transaction created and broadcasted successfully"
+            })
+        });
+});
+
 app.get('/mine', function (req, res) {
     const LastBlock = bitcoin.getLastBlock();
     const previousBlockHash = LastBlock['hash'];
@@ -40,16 +71,65 @@ app.get('/mine', function (req, res) {
     const nonce = bitcoin.ProofOfWork(previousBlockHash, currrentBlockData);
     const blockHash = bitcoin.hashBlock(previousBlockHash, currrentBlockData, nonce);
 
-    bitcoin.createNewTransection(12.5, "00", nodeAdress, "mined added data");
+    //bitcoin.createNewTransection(12.5, "00", nodeAdress, "mined added data");
     const newBlock = bitcoin.createNewBlock(nonce, previousBlockHash, blockHash);
 
-    res.json({
-        note: "new block successful",
-        block: newBlock
+    const requestPromises = []
+    bitcoin.networkNodes.forEach(networkNodeUrl => {
+        const requestOptions = {
+            uri: networkNodeUrl + '/receieve_new_block',
+            method: "POST",
+            body: {
+                newBlock: newBlock
+            },
+            json: true
+        };
+        requestPromises.push(rp(requestOptions));
     });
+    Promise.all(requestPromises)
+        .then(data => {
+            const requestOptions = {
+                uri: bitcoin.currentNodeUrl + '/transaction/broadcast',
+                method: "post",
+                body: {
+                    amount: 12.5,
+                    sender: "00",
+                    reciepient: nodeAdress,
+                    data: "data from mined from node"
+                },
+                json: true
+            };
+            return rp(requestOptions);
+        })
+        .then(data => {
+            res.json({
+                note: "new block mined && broadcasted successful",
+                block: newBlock
+            });
+        });
+
 })
 
+app.post('/receieve_new_block', function (req, res) {
+    const newBlock = req.body.newBlock;
+    const lastBlock = bitcoin.getLastBlock();
+    const correctHash = lastBlock.hash === newBlock.previousBlockHash;
+    const correctIndex = lastBlock['index'] + 1 === newBlock['index'];
+    if (correctHash && correctIndex) {
+        bitcoin.chain.push(newBlock);
+        bitcoin.PendingTransections = [];
+        res.json({
+            note: "new block Recieved andd acccepted",
+            newBlock: newBlock
+        })
+    } else {
+        res.json({
+            note: "new block Rejected ",
+            newBlock: newBlock
+        })
+    }
 
+});
 
 //register and brodcast node to the network
 app.post('/register_brodcast_node', function (req, res) {

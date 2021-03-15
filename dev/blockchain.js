@@ -1,5 +1,9 @@
 const sha256 = require("sha256");
 const currentNodeUrl = process.argv[3];
+const {
+    v4: uuidv4
+} = require('uuid');
+const randomWords = require('random-words');
 
 function Blockchain() {
     this.chain = [];
@@ -52,12 +56,16 @@ Blockchain.prototype.createNewTransection = function (
         ammount: ammount,
         sender: sender,
         recipient: recipient,
-        data: data
+        data: data,
+        transactionId: randomWords(5).join("-").toUpperCase()
     };
 
-    this.PendingTransections.push(newTransection);
+    return newTransection;
+};
 
-    return this.getLastBlock()["index"] + 1;
+Blockchain.prototype.addTransectionToPendingTransaction = function (transactionObj) {
+    this.PendingTransections.push(transactionObj);
+    return this.getLastBlock()['index'] + 1;
 };
 
 //this converts the data to fixed size string using sha256
