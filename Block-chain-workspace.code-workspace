@@ -4,5 +4,23 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+		{
+			"name": "Attach to Chrome",
+			"port": 5005,
+			"request": "attach",
+			"type": "pwa-chrome",
+			"webRoot": "${workspaceFolder}"
+		},
+			{
+				"type": "pwa-chrome",
+				"request": "launch",
+				"name": "Open index.html",
+				"file": "z:\\Project_BlockChain\\dev\\Block-explorer\\index.html"
+			}
+		]
+	}
 }
