@@ -2,8 +2,6 @@ const sha256 = require("sha256");
 const currentNodeUrl = process.argv[3];
 const { v4: uuidv4 } = require("uuid");
 const randomWords = require("random-words");
-const NodeRSA = require("node-rsa");
-const key = new NodeRSA({ b: 512 });
 function Blockchain() {
   this.chain = [];
   this.PendingTransactions = [];
