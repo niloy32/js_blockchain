@@ -282,3 +282,5 @@ app.get("/block-explorer", function (req, res) {
 app.listen(port, function () {
   console.log(`listening to port ${port}...`);
 });
+
+//"test": "echo \"Error: no test specified\" && exit 1",
