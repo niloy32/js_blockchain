@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const Blockchain = require("./Blockchain.js");
+const Blockchain = require("./blockchain.js");
 const rp = require("request-Promise");
 const { v4: uuidv4 } = require("uuid");
 const bitcoin = new Blockchain();
