@@ -92,7 +92,7 @@ app.get("/mine", function (req, res) {
     .then((data) => {
       const requestOptions = {
         uri: bitcoin.currentNodeUrl + "/transaction/broadcast",
-        method: "post",
+        method: "POST",
         body: {
           amount: 12.5,
           sender: "00",
@@ -279,8 +279,12 @@ app.get("/block-explorer", function (req, res) {
   res.sendFile("./Block-explorer/index.html", { root: __dirname });
 });
 
-app.listen(process.env.PORT, function () {
-  console.log(`listening to port ${port}...`);
-});
+// app.listen(process.env.PORT, function () {
+//   console.log(`listening to port ${port}...`);
+// });
 
 //"test": "echo \"Error: no test specified\" && exit 1",
+
+app.listen(3001, function () {
+  console.log(`listening to port 3001...`);
+});

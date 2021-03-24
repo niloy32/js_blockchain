@@ -52,7 +52,8 @@ Blockchain.prototype.createNewTransaction = function (
     amount: amount,
     sender: sender,
     recipient: recipient,
-    data: `this data was added at ${new Date().toLocaleTimeString()}`,
+    data:
+      `this data was added at ${new Date().toLocaleTimeString()}` + " " + data,
     transactionId: randomWords(5).join("-").toUpperCase(),
   };
 
