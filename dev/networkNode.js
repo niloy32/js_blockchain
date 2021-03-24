@@ -279,7 +279,7 @@ app.get("/block-explorer", function (req, res) {
   res.sendFile("./Block-explorer/index.html", { root: __dirname });
 });
 
-app.listen(port, function () {
+app.listen(process.env.PORT, function () {
   console.log(`listening to port ${port}...`);
 });
 
