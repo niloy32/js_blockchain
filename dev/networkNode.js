@@ -285,6 +285,6 @@ app.get("/block-explorer", function (req, res) {
 
 //"test": "echo \"Error: no test specified\" && exit 1",
 
-app.listen(3001, function () {
-  console.log(`listening to port 3001...`);
+app.listen(process.env.PORT, function () {
+  console.log(`listening to port ${process.env.PORT}...`);
 });
